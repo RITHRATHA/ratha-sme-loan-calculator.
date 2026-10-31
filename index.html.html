@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ឧបករណ៍គណនាកម្ចី SME - SME Loan Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Khmer -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Battambang:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0B2545',
+                            900: '#081C33',
+                        },
+                        gold: {
+                            500: '#D4AF37',
+                            600: '#AA820A',
+                        }
+                    },
+                    fontFamily: {
+                        khmer: ['"Kantumruy Pro"', '"Battambang"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Kantumruy Pro', 'Battambang', sans-serif;
+            background-color: #f8fafc;
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #0B2545 0%, #134074 100%);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="gradient-header text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-6 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-xl bg-gold-500 flex items-center justify-center text-navy-900 font-bold text-2xl shadow-lg">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl sm:text-2xl tracking-wide">SME LOAN CALCULATOR</h1>
+                    <p class="text-xs sm:text-sm text-slate-300">ឧបករណ៍គណនាប្រាក់កម្ចីអាជីវកម្ម និងតារាងបង់ប្រាក់</p>
+                </div>
+            </div>
+            <a href="https://t.me/RITH_RATHA_KH" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-xl text-sm transition duration-200 shadow flex items-center gap-2">
+                <i class="fa-brands fa-telegram text-lg"></i>
+                <span>ពិភាក្សាឥណទានផ្ទាល់</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Section -->
+    <main class="max-w-6xl w-full mx-auto px-4 py-8 space-y-8 flex-1">
+
+        <!-- Calculator Form & Summary Card Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Form Input Section (7 cols) -->
+            <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 space-y-6">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="font-bold text-lg text-navy-900 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-blue-600"></i>
+                        បញ្ចូលព័ត៌មានកម្ចី (Loan Parameters)
+                    </h2>
+                    <p class="text-xs text-slate-500">កំណត់អត្រាការប្រាក់ ទឹកប្រាក់ និងរបៀបសងប្រាក់</p>
+                </div>
+
+                <form id="calc-form" onsubmit="event.preventDefault(); calculateLoan();" class="space-y-5">
+                    
+                    <!-- Loan Amount -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">ទំហំប្រាក់កម្ចី ($) *</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-bold text-sm">$</span>
+                            <input type="number" id="loan-amount" min="100" max="1000000" step="100" value="10000" required oninput="calculateLoan()" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <!-- Interest Rate & Tenure Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Interest Rate (Max 18%) -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-slate-700">អត្រាការប្រាក់ (%/ឆ្នាំ) *</label>
+                                <span class="text-[11px] text-emerald-600 font-bold">អតិបរមា ១៨%</span>
+                            </div>
+                            <div class="relative">
+                                <input type="number" id="interest-rate" min="0.1" max="18" step="0.1" value="12" required oninput="validateAndCalculate()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
+                                <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 font-bold text-xs">%</span>
+                            </div>
+                            <!-- Warning Message -->
+                            <p id="rate-warning" class="text-[11px] text-red-500 mt-1 hidden flex items-center gap-1">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                អត្រាការប្រាក់មិនអាចលើសពី ១៨% ក្នុងមួយឆ្នាំឡើយ!
+                            </p>
+                        </div>
+
+                        <!-- Loan Tenure -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">រយៈពេលកម្ចី (ខែ) *</label>
+                            <input type="number" id="loan-tenure" min="1" max="120" step="1" value="24" required oninput="calculateLoan()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Radio Options -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">វិធីសាស្ត្រនៃការសងប្រាក់ *</label>
+                        <div class="space-y-2">
+                            <!-- Option 1: Equal Installment (Amortized) -->
+                            <label class="flex items-start p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="payment-method" value="amortized" checked onchange="calculateLoan()" class="mt-1 text-blue-600 focus:ring-blue-500">
+                                <div class="ml-3">
+                                    <span class="block text-xs font-bold text-slate-800">១. សងថយចុះស្មើៗគ្នា (Equal Monthly Installment)</span>
+                                    <span class="block text-[11px] text-slate-500">ប្រាក់សរុបបង់ប្រចាំខែថេរ (ដើម+ការប្រាក់ស្មើគ្នារាល់ខែ)</span>
+                                </div>
+                            </label>
+
+                            <!-- Option 2: Declining Balance (Equal Principal) -->
+                            <label class="flex items-start p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="payment-method" value="declining" onchange="calculateLoan()" class="mt-1 text-blue-600 focus:ring-blue-500">
+                                <div class="ml-3">
+                                    <span class="block text-xs font-bold text-slate-800">២. រំលស់ដើមថេរ ការប្រាក់ថយចុះ (Equal Principal)</span>
+                                    <span class="block text-[11px] text-slate-500">ប្រាក់ដើមបង់ថេររាល់ខែ ការប្រាក់ថយចុះទៅតាមតុល្យភាពសល់</span>
+                                </div>
+                            </label>
+
+                            <!-- Option 3: Interest Only (Bullet Payment) -->
+                            <label class="flex items-start p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+                                <input type="radio" name="payment-method" value="interest_only" onchange="calculateLoan()" class="mt-1 text-blue-600 focus:ring-blue-500">
+                                <div class="ml-3">
+                                    <span class="block text-xs font-bold text-slate-800">៣. បង់តែការប្រាក់ ដើមបង់ផ្តាច់ចុងគ្រា (Interest Only / Bullet)</span>
+                                    <span class="block text-[11px] text-slate-500">បង់តែការប្រាក់ប្រចាំខែ ហើយប្រាក់ដើមបង់ផ្តាច់នៅខែចុងក្រោយ</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Right Calculation Results Card (5 cols) -->
+            <div class="lg:col-span-5 bg-navy-900 text-white rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-6">
+                <div>
+                    <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
+                        <h3 class="font-bold text-lg text-gold-500 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            លទ្ធផលនៃការគណនា
+                        </h3>
+                        <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded-md">USD ($)</span>
+                    </div>
+
+                    <div class="mt-6 space-y-5">
+                        <!-- Primary Repayment Highlight -->
+                        <div class="bg-slate-800/80 rounded-xl p-4 border border-slate-700/60">
+                            <span id="repayment-label" class="text-xs text-slate-400 block mb-1">ប្រាក់ត្រូវបង់ប្រចាំខែដំបូង</span>
+                            <div id="monthly-payment-display" class="text-3xl font-extrabold text-emerald-400">$0.00</div>
+                            <span id="repayment-note" class="text-[11px] text-slate-400 block mt-1"></span>
+                        </div>
+
+                        <!-- Breakdown stats -->
+                        <div class="space-y-3 text-xs">
+                            <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                                <span class="text-slate-400">ប្រាក់ដើមស្នើសុំសរុប (Principal)</span>
+                                <span id="summary-principal" class="font-bold text-white">$0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                                <span class="text-slate-400">ការប្រាក់សរុបត្រូវបង់ (Total Interest)</span>
+                                <span id="summary-interest" class="font-bold text-gold-500">$0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+                                <span class="text-slate-400">ទឹកប្រាក់ត្រូវបង់សរុប (Total Repayment)</span>
+                                <span id="summary-total" class="font-extrabold text-blue-400 text-sm">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="scrollToSchedule()" class="w-full bg-gold-500 hover:bg-gold-600 text-navy-900 font-bold py-3 rounded-xl transition duration-200 text-xs flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-table-list"></i>
+                    <span>មើលតារាងបង់ប្រាក់លម្អិត (Schedule)</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Amortization Schedule Table -->
+        <div id="schedule-section" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-list-ol text-blue-600"></i>
+                        តារាងលម្អិតនៃការបង់ប្រាក់ប្រចាំខែ (Amortization Schedule)
+                    </h3>
+                    <p class="text-xs text-slate-500">បែងចែកប្រាក់ដើម ការប្រាក់ និងប្រាក់សល់តាមខែ</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto max-h-[450px]">
+                <table class="w-full text-left text-xs text-slate-600">
+                    <thead class="bg-slate-50 uppercase text-[10px] font-bold tracking-wider text-slate-500 sticky top-0 border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-4">ខែទី (Month)</th>
+                            <th class="py-3 px-4">ប្រាក់ដើមដើមគ្រា</th>
+                            <th class="py-3 px-4">ប្រាក់ដើមត្រូវបង់</th>
+                            <th class="py-3 px-4">ការប្រាក់ត្រូវបង់</th>
+                            <th class="py-3 px-4 text-emerald-600">ប្រាក់សរុបត្រូវបង់</th>
+                            <th class="py-3 px-4 text-right">ប្រាក់ដើមចុងគ្រា</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-table-body" class="divide-y divide-slate-100">
+                        <!-- Dynamic Rows Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer & Contact Banner -->
+    <footer class="bg-navy-900 text-white mt-12 border-t-4 border-gold-500">
+        <div class="max-w-6xl mx-auto px-4 py-8 space-y-6 text-center">
+            
+            <!-- Contact Banner Requested -->
+            <div class="bg-slate-800/80 border border-slate-700 p-6 rounded-2xl space-y-4 shadow-lg max-w-3xl mx-auto">
+                <h3 class="text-lg sm:text-xl font-bold text-gold-500">
+                    យើងខ្ញុំមានសេវាកម្មប្រឹក្សាកម្ចីគ្រប់ទំហំ
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    ជួយសម្របសម្រួល រៀបចំឯកសារអាជីវកម្ម និងវិភាគលទ្ធភាពសងប្រាក់ ដើម្បីបង្កើនឱកាសទទួលបានការអនុម័តពីធនាគារ!
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 pt-2">
+                    <!-- Phone Contact -->
+                    <a href="tel:0974880041" class="w-full sm:w-auto bg-slate-700 hover:bg-slate-600 px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 border border-slate-600 transition">
+                        <i class="fa-solid fa-phone text-emerald-400"></i>
+                        <span>លេខទំនាក់ទំនង៖ 0974880041</span>
+                    </a>
+
+                    <!-- Telegram Contact Link -->
+                    <a href="https://t.me/RITH_RATHA_KH" target="_blank" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition shadow">
+                        <i class="fa-brands fa-telegram text-lg"></i>
+                        <span>@RITH_RATHA_KH (ចុចមកកាន់ Telegram)</span>
+                    </a>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-400">
+                © 2026 SME Loan Consultancy Services. រក្សាសិទ្ធិគ្រប់យ៉ាង។
+            </p>
+        </div>
+    </footer>
+
+    <!-- JavaScript logic -->
+    <script>
+        window.onload = function() {
+            calculateLoan();
+        };
+
+        function validateAndCalculate() {
+            const rateInput = document.getElementById('interest-rate');
+            const warning = document.getElementById('rate-warning');
+            
+            let val = parseFloat(rateInput.value);
+            if (val > 18) {
+                warning.classList.remove('hidden');
+                rateInput.value = 18;
+            } else {
+                warning.classList.add('hidden');
+            }
+            calculateLoan();
+        }
+
+        function calculateLoan() {
+            const amount = parseFloat(document.getElementById('loan-amount').value) || 0;
+            const annualRate = parseFloat(document.getElementById('interest-rate').value) || 0;
+            const tenureMonths = parseInt(document.getElementById('loan-tenure').value) || 0;
+            const method = document.querySelector('input[name="payment-method"]:checked').value;
+
+            if (amount <= 0 || tenureMonths <= 0 || annualRate <= 0) {
+                return;
+            }
+
+            const monthlyRate = (annualRate / 100) / 12;
+            const tableBody = document.getElementById('schedule-table-body');
+            tableBody.innerHTML = '';
+
+            let totalInterest = 0;
+            let totalRepayment = 0;
+            let balance = amount;
+
+            let scheduleData = [];
+
+            if (method === 'amortized') {
+                // 1. Equal Monthly Installment (EMI)
+                const emi = amount * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths) / (Math.pow(1 + monthlyRate, tenureMonths) - 1);
+                
+                document.getElementById('repayment-label').innerText = "ប្រាក់ត្រូវបង់ប្រចាំខែ (ថេរ)";
+                document.getElementById('monthly-payment-display').innerText = "$" + emi.toFixed(2);
+                document.getElementById('repayment-note').innerText = "ស្មើគ្នារៀងរាល់ខែរហូតផុតអាណត្តិ";
+
+                for (let m = 1; m <= tenureMonths; m++) {
+                    const interestPayment = balance * monthlyRate;
+                    const principalPayment = emi - interestPayment;
+                    const endingBalance = Math.max(0, balance - principalPayment);
+
+                    totalInterest += interestPayment;
+                    scheduleData.push({
+                        month: m,
+                        startBalance: balance,
+                        principal: principalPayment,
+                        interest: interestPayment,
+                        total: emi,
+                        endBalance: endingBalance
+                    });
+                    balance = endingBalance;
+                }
+            } else if (method === 'declining') {
+                // 2. Equal Principal (Declining Balance)
+                const fixedPrincipal = amount / tenureMonths;
+                const firstMonthInterest = amount * monthlyRate;
+                const firstMonthTotal = fixedPrincipal + firstMonthInterest;
+
+                document.getElementById('repayment-label').innerText = "ប្រាក់ត្រូវបង់ខែដំបូង (ថយចុះ)";
+                document.getElementById('monthly-payment-display').innerText = "$" + firstMonthTotal.toFixed(2);
+                document.getElementById('repayment-note').innerText = "ថយចុះជាលំដាប់នៅខែបន្តបន្ទាប់";
+
+                for (let m = 1; m <= tenureMonths; m++) {
+                    const interestPayment = balance * monthlyRate;
+                    const totalMonthlyPayment = fixedPrincipal + interestPayment;
+                    const endingBalance = Math.max(0, balance - fixedPrincipal);
+
+                    totalInterest += interestPayment;
+                    scheduleData.push({
+                        month: m,
+                        startBalance: balance,
+                        principal: fixedPrincipal,
+                        interest: interestPayment,
+                        total: totalMonthlyPayment,
+                        endBalance: endingBalance
+                    });
+                    balance = endingBalance;
+                }
+            } else if (method === 'interest_only') {
+                // 3. Interest Only / Bullet Payment
+                const monthlyInterest = amount * monthlyRate;
+
+                document.getElementById('repayment-label').innerText = "ប្រាក់ត្រូវបង់ (ខែទី ១ ដល់ " + (tenureMonths - 1) + ")";
+                document.getElementById('monthly-payment-display').innerText = "$" + monthlyInterest.toFixed(2);
+                document.getElementById('repayment-note').innerText = "ខែចុងក្រោយបង់ប្រាក់ដើម $" + amount.toLocaleString() + " ផ្តាច់";
+
+                for (let m = 1; m <= tenureMonths; m++) {
+                    const interestPayment = balance * monthlyRate;
+                    const principalPayment = (m === tenureMonths) ? amount : 0;
+                    const totalMonthlyPayment = principalPayment + interestPayment;
+                    const endingBalance = (m === tenureMonths) ? 0 : amount;
+
+                    totalInterest += interestPayment;
+                    scheduleData.push({
+                        month: m,
+                        startBalance: balance,
+                        principal: principalPayment,
+                        interest: interestPayment,
+                        total: totalMonthlyPayment,
+                        endBalance: endingBalance
+                    });
+                    balance = endingBalance;
+                }
+            }
+
+            totalRepayment = amount + totalInterest;
+
+            // Render Summary Data
+            document.getElementById('summary-principal').innerText = "$" + amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('summary-interest').innerText = "$" + totalInterest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('summary-total').innerText = "$" + totalRepayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            // Render Schedule Table
+            scheduleData.forEach((row) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-4 font-bold text-slate-800">ខែទី ${row.month}</td>
+                    <td class="py-2.5 px-4">$${row.startBalance.toFixed(2)}</td>
+                    <td class="py-2.5 px-4 font-semibold text-slate-700">$${row.principal.toFixed(2)}</td>
+                    <td class="py-2.5 px-4 text-gold-600 font-semibold">$${row.interest.toFixed(2)}</td>
+                    <td class="py-2.5 px-4 font-bold text-emerald-600">$${row.total.toFixed(2)}</td>
+                    <td class="py-2.5 px-4 text-right font-medium">$${row.endBalance.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function scrollToSchedule() {
+            document.getElementById('schedule-section').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
